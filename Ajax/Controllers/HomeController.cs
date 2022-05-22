@@ -1,5 +1,6 @@
 ﻿using Ajax.DAL;
 using Ajax.Models;
+using System;
 using System.Linq;
 using System.Web.Mvc;
 using System.Web.Script.Serialization;
@@ -57,13 +58,26 @@ namespace Ajax.Controllers
         }
 
         [HttpGet]
-        public JsonResult LoadData(int page, int pageSize = 2)
+        public JsonResult LoadData(string name, string status, int page, int pageSize = 2)
         {
-            var model = _context.Employees.OrderBy(x=>x.Id).Skip((page - 1) * pageSize).Take(pageSize);
-            int totalRow = _context.Employees.Count();
+            IQueryable<Employee> model = _context.Employees;
+            if (!string.IsNullOrEmpty(name))
+                model = model.Where(x => x.Name.Contains(name));
+            if (!string.IsNullOrEmpty(status))
+            {
+                var statusBool = bool.Parse(status);
+                model = model.Where(x => x.Status == statusBool);
+            }
+            int totalRow = model.Count();
+            model = model.OrderBy(x=>x.Id).Skip((page - 1) * pageSize).Take(pageSize);          
             return Json(new { data = model, total = totalRow, status = true }, JsonRequestBehavior.AllowGet);
         }
-
+        [HttpGet]
+        public JsonResult GetDetail(int id)
+        {
+            var employee = _context.Employees.Find(id);
+            return Json(new { data = employee, status = true }, JsonRequestBehavior.AllowGet);
+        }
         [HttpPost]
         public JsonResult Update(string model)
         {
@@ -72,6 +86,63 @@ namespace Ajax.Controllers
             var entity = _context.Employees.Find(employee.Id);
             entity.Salary = employee.Salary;
             return Json(new { status = true });
+        }
+        [HttpPost]
+        public JsonResult Delete(int id)
+        {
+            var employee = _context.Employees.Find(id);
+            _context.Employees.Remove(employee);
+            try
+            {
+                _context.SaveChanges();
+                return Json(new { status = true });
+            }
+            catch(Exception e)
+            {
+                return Json(new { status = false, message = e.Message });
+            }     
+        }
+        [HttpPost]
+        public JsonResult SaveData(string strEmployee)
+        {
+            JavaScriptSerializer serializer = new JavaScriptSerializer();
+            Employee employee = serializer.Deserialize<Employee>(strEmployee);
+            bool status = false;
+            string message = string.Empty;
+            //add new if id = 0
+            if (employee.Id == 0)
+            {
+                employee.CreatedDate = DateTime.Now;
+                _context.Employees.Add(employee);
+                try
+                {
+                    _context.SaveChanges();
+                    status = true;
+                }
+                catch (Exception ex)
+                {
+                    status = false;
+                    message = ex.Message;
+                }
+            }
+            //update existing DB
+            else
+            {
+                var entity = _context.Employees.Find(employee.Id);
+                entity.Name = employee.Name;
+                entity.Salary = employee.Salary;
+                entity.Status = employee.Status;   
+                try
+                {
+                    _context.SaveChanges();
+                    status = true;
+                }catch(Exception ex)
+                {
+                    status = false;
+                    message = ex.Message;
+                }
+            } 
+            return Json(new { status = status, message = message });
         }
     }
 }

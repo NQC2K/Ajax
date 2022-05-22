@@ -1,37 +1,86 @@
 ﻿@{
-    ViewBag.Title = "Home Page";
+    ViewBag.Title = "Employee list";
 }
 
 @section scripts{
-    <script src="~/Scripts/plugins/twbsPagination.min.js"></script>
-    <script src="~/Scripts/homeController.js"></script>
+    <script src="~/Scripts/bootbox.min.js"></script>
     <script src="~/Scripts/plugins/mustache.min.js"></script>
+    <script src="~/Scripts/plugins/twbsPagination.min.js"></script>
+    <script src="~/Scripts/jquery.validate.min.js"></script>
+    <script src="~/Scripts/homeController.js"></script>
+
 }
-
-<table class="table">
-    <thead>
-        <tr>
-            <td>Id</td>
-            <td>Name</td>
-            <td>Salary</td>
-            <td>Status</td>
-        </tr>
-    </thead>
-    <tbody id="tblData">
-    </tbody>
-</table>
-<div id="pagination" class="pagination">
-
+<br />
+<div class="row">
+    <div class="col-md-12">
+        <div class="col-md-11">
+            <div class="col-md-4">
+                <input type="text" class="form-control" id="txtSearch" placeholder="Type name" />
+            </div>
+            <div class="col-md-4">
+                <select class="form-control" id="ddlStatusS">
+                    <option value="">All</option>
+                    <option value="true">Active</option>
+                    <option value="false">Inactive</option>
+                </select>
+            </div>
+            <div class="col-md-4">
+                <button class="btn btn-primary" id="btnSearch">Search</button>
+                <button class="btn btn-default" id="btnReset">Reset</button>
+            </div>
+        </div>
+        <div class="col-md-1">
+            <button id="btnAddNew" class="btn btn-success pull-right">Add employee</button>
+        </div>
+    </div>
 </div>
+<br />
+<div class="row">
+    <div class="col-md-12">
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <td>Id</td>
+                    <td>Name</td>
+                    <td>Salary</td>
+                    <td>Status</td>
+                    <td>#</td>
+                </tr>
+            </thead>
+            <tbody id="tblData">
+            </tbody>
+        </table>
+        <div id="pagination" class="pagination">
 
-<script id="data-template" type="x-tmpl-mustache">
+        </div>
+
+        <script id="data-template" type="x-tmpl-mustache">
         <tr>
             <td>{{Id}}</td>
             <td>{{Name}}</td>
             <td><input type="number" class="txtSalary" data-id="{{Id}}" value="{{Salary}}" /></td>
             <td>{{{Status}}}</td>
+            <td>
+                <button class="btn btn-primary btn-edit" data-id="{{Id}}">Edit</button>
+                <button class="btn btn-danger btn-delete" data-id="{{Id}}">Delete</button>
+            </td>
+
         </tr>
-</script>
+        </script>
+    </div>
+</div>
+
+@RenderPage("_AddUpdateModal.cshtml")
+
+
+
+
+
+
+
+
+
+
 
 <!--<p>Click "Add" button to see what happens:</p>
 <button id="btn-add">Add</button>
