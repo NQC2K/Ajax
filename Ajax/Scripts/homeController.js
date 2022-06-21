@@ -198,9 +198,8 @@ var homeController = {
             },
             success: function (res) {
                 if (res.status) {
-                    /*alert(res.status);*/
+                    alert(res.status);
                     var data = res.data;
-                    /*                    alert(data);*/
                     var html = '';
                     var template = $('#data-template').html();
                     $.each(data, function (i, item) {
@@ -232,10 +231,10 @@ var homeController = {
         }
         $('#pagination').twbsPagination({
             totalPages: totalPage,
-            first: "Đầu",
-            next: "Tiếp",
-            last: "Cuối",
-            prev: "Trước",
+            first: "<<",
+            next: ">",
+            last: ">>",
+            prev: "<",
             initiateStartPageClick: false,
             visiblePages: 5,
             onPageClick: function (event, page) {
